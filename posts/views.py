@@ -3,12 +3,27 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 from posts.models import Post
+from posts.posts import get_posts_filter_by_rate
 
 def home(request):
-    post = Post.objects.get(id=1)
-    return HttpResponse(f"<h1>Text</h1>   ---- {post.title} <br> {post.content}")
+    return render(request, "base.html")
 
 def post(request):
-    post = Post.objects.get(id=1)
+    posts = get_posts_filter_by_rate(2)
     
-    return render (request, template_name='base.html')
+    return render (request, template_name='posts/posts.html', context={"posts": posts})
+
+def get_post(request, id):
+    post = Post.objects.get(id=id)
+    
+    return render(request, template_name="posts/post.html", context={"post": post})
+
+
+# Добавил нов ф.
+def posts(request):
+    posts = Post.objects.filter(
+        is_published=True,
+        rating__gt=5
+    )
+
+    return render(request, 'posts/posts.html', {'posts': posts})

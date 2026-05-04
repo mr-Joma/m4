@@ -34,6 +34,8 @@ class Post(models.Model):
     user = models.IntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     udated_at = models.DateTimeField(auto_now=True)
+    category = models.CharField(null=True, blank=True)
+    is_published = models.BooleanField(default=False) # Добавил
     
     def __str__(self):
         return f"{self.title}  - -  {self.content[:10]}"
