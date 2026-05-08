@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # CERATE TABLE IF NOT EXISTS ...
 # class Model(models.Model): ...
@@ -26,16 +27,30 @@ from django.db import models
 
 # Create your models here.
 
+class Profile(models.Model):
+    name = models.CharField(max_length=255)
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+
+class Tag(models.Model):
+    title = models.CharField(max_length=255)
+
 
 class Post(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     rate = models.IntegerField()
-    user = models.IntegerField(null=True, blank=True)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    udated_at = models.DateTimeField(auto_now=True)
-    category = models.CharField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
     is_published = models.BooleanField(default=False) # Добавил
+    image = models.ImageField(upload_to="posts", null=True, blank=True)
+    category = models.ForeignKey(
+        "Category", null=True, blank=True, on_delete=models.SET_NULL
+    )
+    
+    tags = models.ManyToManyField(Tag, null=True, blank=True)
     
     def __str__(self):
         return f"{self.title}  - -  {self.content[:10]}"
