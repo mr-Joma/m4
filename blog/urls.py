@@ -19,14 +19,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from posts.views import get_post, get_posts_by_category, home, post
+from posts.views import get_post, home, post, get_posts_by_category, create_post
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("", home, name="home"),
-    path("posts/", post, name="posts"),
-    path("posts/<int:id>/", get_post, name="post"),
+    path('admin/', admin.site.urls),
+    path('', home, name="home"),
+    path('posts/', post, name="posts"),
+    path('posts/<int:id>/', get_post, name="post"),
     path("posts/category/<int:id>/", get_posts_by_category, name="category"),
+    path("posts/create", create_post, name="create_post"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
