@@ -2,7 +2,8 @@
 from django.http import HttpRequest
 from django.shortcuts import render, get_object_or_404, redirect
 
-from posts.forms import PostForm
+                                    #ДЗ(3-4)
+from posts.forms import PostForm, CategoryForm
 from posts.models import Post, Category
 from posts.posts import get_posts_filter_by_rate
 
@@ -21,7 +22,7 @@ def get_posts_by_category(request, id):
     posts = Post.objects.filter(category_id=id)
     return render(request, template_name="posts/posts.html", context={"posts": posts})
 
-# Добавил нов ф.
+# ДЗ(2)
 def posts(request):
     posts = Post.objects.filter(
         is_published=True,
@@ -85,4 +86,23 @@ def create_post(request: HttpRequest):
         request,
         "posts/create_post.html",
         context={"form": form, "categories": categories},
+    )
+
+#ДЗ(3-4)
+def category_create(request):
+
+    if request.method == "POST":
+        form = CategoryForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return redirect("posts")
+
+    else:
+        form = CategoryForm()
+
+    return render(
+        request,
+        "posts/category_create.html",
+        {"form": form}
     )

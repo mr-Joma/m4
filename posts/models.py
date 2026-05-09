@@ -44,7 +44,7 @@ class Post(models.Model):
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_published = models.BooleanField(default=False) # Добавил
+    is_published = models.BooleanField(default=False) # ДЗ(2)
     image = models.ImageField(upload_to="posts", null=True, blank=True)
     category = models.ForeignKey(
         "Category", null=True, blank=True, on_delete=models.SET_NULL
