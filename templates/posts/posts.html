@@ -45,7 +45,7 @@
                         <!-- Чтобы кнопка прижалась к низу карточки -->
                         <div class="mt-auto">
                             {% if post.category %}
-                            <a href="{% url 'category' post.category.id %}">{{ post.category.name }}</a>
+                            <a href="{% url 'category' post.category.id %}" class="d-block mb-2 text-decoration-none">{{ post.category.name }}</a>
                             {% endif %}
                             <a href="{% url 'post' post.id %}" class="btn btn-primary">
                                 Читать полностью

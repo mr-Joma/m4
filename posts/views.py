@@ -4,7 +4,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 
                                     #ДЗ(3-4)
 from posts.form import PostForm, CategoryForm, TestForm
-from posts.models import Post, Category
+                                        # HW5
+from posts.models import Post, Category, Tag
 from posts.posts import get_posts_filter_by_rate
 
 def home(request):
@@ -39,15 +40,20 @@ def create_post(request: HttpRequest):
 
         if form.is_valid():
             cleaned_data = form.cleaned_data
-
-            Post.objects.create(
+            
+            # HW5
+            post = Post.objects.create(
                 title=cleaned_data["title"],
                 content=cleaned_data["content"],
                 rate=cleaned_data["rate"],
                 image=cleaned_data["image"],
                 category_id=cleaned_data["category"],
             )
-
+            
+            # HW5
+            tags = request.POST.getlist("tags")
+            post.tags.set(tags)
+            
             return redirect("posts")
 
         return render(request, "posts/create_post.html", context={"error": form.errors})
@@ -55,11 +61,14 @@ def create_post(request: HttpRequest):
     form = PostForm()
 
     categories = Category.objects.all()
+    
+    # HW5
+    tags = Tag.objects.all()
 
     return render(
         request,
-        "posts/create_post.html",
-        context={"form": form, "categories": categories},
+        "posts/create_post.html",                          # HW5
+        context={"form": form, "categories": categories, "tags": tags},
     )
 
 #ДЗ(3-4)

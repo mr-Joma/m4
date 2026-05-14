@@ -1,7 +1,7 @@
 from django.forms import ModelForm, Form, CharField, IntegerField, ImageField
 
-                              # ДЗ(3-4)
-from posts.models import Post, Category
+                              # ДЗ(3-4)  # HW5
+from posts.models import Post, Category, Tag
 
 
 class PostForm(ModelForm):
@@ -22,3 +22,4 @@ class TestForm(Form):
     rate = IntegerField(min_value=1, max_value=10, required=False)
     category = IntegerField(required=False)
     image = ImageField(required=False)
+    tags = CharField(required=False) # HW5

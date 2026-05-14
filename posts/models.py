@@ -50,7 +50,7 @@ class Post(models.Model):
         "Category", null=True, blank=True, on_delete=models.SET_NULL
     )
     
-    tags = models.ManyToManyField(Tag, null=True, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True) # HW5 / убрал null=True
     
     def __str__(self):
         return f"{self.title}  - -  {self.content[:10]}"

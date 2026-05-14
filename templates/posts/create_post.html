@@ -66,7 +66,23 @@
                                 </select>
                         </div>
                         {% endif %}
+                        
+                        <!-- HW5 -->
+                        <div class="mb-3">
+                            <label class="form-label">Тэги</label>
 
+                            <select class="form-select" name="tags" multiple>
+
+                                {% for tag in tags %}
+
+                                    <option value="{{ tag.id }}">
+                                        {{ tag.title }}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+                        </div>
                         <!-- Submit -->
                         <button type="submit" class="btn btn-primary w-100">
                             Создать пост
