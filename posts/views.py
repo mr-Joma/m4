@@ -7,6 +7,7 @@ from posts.form import PostForm, CategoryForm, TestForm
                                         # HW5
 from posts.models import Post, Category, Tag
 from posts.posts import get_posts_filter_by_rate
+from django.contrib.auth.decorators import login_required
 
 def home(request):
     return render(request, "base.html")
@@ -32,7 +33,7 @@ def posts(request):
 
     return render(request, 'posts/posts.html', {'posts': posts})
 
-# lesson5
+@login_required
 def create_post(request: HttpRequest):
 
     if request.method == "POST":
@@ -48,6 +49,7 @@ def create_post(request: HttpRequest):
                 rate=cleaned_data["rate"],
                 image=cleaned_data["image"],
                 category_id=cleaned_data["category"],
+                user=request.user,
             )
             
             # HW5

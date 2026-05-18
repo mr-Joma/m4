@@ -20,6 +20,7 @@ from django.contrib import admin
 from django.urls import path
 
 from posts.views import get_post, home, post, get_posts_by_category, create_post, category_create, edit_post, delete_post
+from users.views import login_user, logout_user
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,6 +32,8 @@ urlpatterns = [
     path('category-create/', category_create, name='category_create'), #ДЗ(3-4)
     path("posts/<int:pk>/edit/", edit_post, name="edit_post"),# lesson 5
     path("posts/<int:id>/delete", delete_post, name="delete_post"),# lesson 5
+    path("user/login/", login_user, name="login"),
+    path("user/logout/", logout_user, name="logout"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
