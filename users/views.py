@@ -2,6 +2,8 @@ from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect
 # Create your views here.
 
+# HW 6
+from django.contrib.auth.models import User
 
 def login_user(request):
     
@@ -23,3 +25,29 @@ def logout_user(request):
     logout(request)
     
     return redirect("home")
+
+
+# HW 6
+def register_user(request):
+
+    if request.method == "POST":
+
+        username = request.POST["username"]
+        password = request.POST["password"]
+
+        if User.objects.filter(username=username).exists():
+
+            return render(
+                request,
+                "users/register.html",
+                {"error": "Пользователь уже существует"}
+            )
+
+        User.objects.create_user(
+            username=username,
+            password=password
+        )
+
+        return redirect("login")
+
+    return render(request, "users/register.html")
