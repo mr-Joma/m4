@@ -1,135 +1,107 @@
-# Create your views here.
-from django.http import HttpRequest
-from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import (
+    TemplateView,
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+)
 
-                                    #ДЗ(3-4)
-from posts.form import PostForm, CategoryForm, TestForm
-                                        # HW5
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+
 from posts.models import Post, Category, Tag
-from posts.posts import get_posts_filter_by_rate
-from django.contrib.auth.decorators import login_required
 
-def home(request):
-    return render(request, "base.html")
 
-def post(request):
-    posts = get_posts_filter_by_rate(2)
-    return render (request, template_name='posts/posts.html', context={"posts": posts})
+# ГЛАВНАЯ
+class HomeView(TemplateView):
+    template_name = "base.html"
 
-def get_post(request, id):
-    post = get_object_or_404(Post, id=id)
-    return render(request, template_name="posts/post.html", context={"post": post})
 
-def get_posts_by_category(request, id):
-    posts = Post.objects.filter(category_id=id)
-    return render(request, template_name="posts/posts.html", context={"posts": posts})
 
-# ДЗ(2)
-def posts(request):
-    posts = Post.objects.filter(
-        is_published=True,
-        rating__gt=5
-    )
+# СПИСОК ПОСТОВ
+class PostListView(ListView):
+    model = Post
+    template_name = "posts/posts.html"
+    context_object_name = "posts"
+    paginate_by = 9
 
-    return render(request, 'posts/posts.html', {'posts': posts})
+    def get_queryset(self):
 
-@login_required
-def create_post(request: HttpRequest):
+        return Post.objects.all().order_by("-created_at")
 
-    if request.method == "POST":
-        form = TestForm(request.POST, request.FILES)
 
-        if form.is_valid():
-            cleaned_data = form.cleaned_data
-            
-            # HW5
-            post = Post.objects.create(
-                title=cleaned_data["title"],
-                content=cleaned_data["content"],
-                rate=cleaned_data["rate"],
-                image=cleaned_data["image"],
-                category_id=cleaned_data["category"],
-                user=request.user,
-            )
-            
-            # HW5
-            tags = request.POST.getlist("tags")
-            post.tags.set(tags)
-            
-            return redirect("posts")
+# ДЕТАЛЬНЫЙ ПОСТ
+class PostDetailView(DetailView):
+    model = Post
+    template_name = "posts/post.html"
+    context_object_name = "post"
+    pk_url_kwarg = "id"
 
-        return render(request, "posts/create_post.html", context={"error": form.errors})
-    
-    form = PostForm()
 
-    categories = Category.objects.all()
-    
-    # HW5
-    tags = Tag.objects.all()
+# СОЗДАНИЕ ПОСТА
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    fields = ["title", "content", "rate", "image", "category"]
+    template_name = "posts/create_post.html"
+    success_url = reverse_lazy("posts")
 
-    return render(
-        request,
-        "posts/create_post.html",                          # HW5
-        context={"form": form, "categories": categories, "tags": tags},
-    )
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        response = super().form_valid(form)
+        tags = self.request.POST.getlist("tags")
+        self.object.tags.set(tags)
 
-#ДЗ(3-4)
-def category_create(request):
+        return response
 
-    if request.method == "POST":
-        form = CategoryForm(request.POST)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["categories"] = Category.objects.all()
+        context["tags"] = Tag.objects.all()
 
-        if form.is_valid():
-            form.save()
-            return redirect("posts")
+        return context
 
-    else:
-        form = CategoryForm()
 
-    return render(
-        request,
-        "posts/category_create.html",
-        {"form": form}
-    )
-    
-# lesson5
-def edit_post(request: HttpRequest, pk):
-    post = get_object_or_404(Post, id=pk)
-    categories = Category.objects.all()
-    if request.method == "POST":
-        form = TestForm(request.POST, request.FILES)
+# РЕДАКТИРОВАНИЕ ПОСТА
+class PostUpdateView(LoginRequiredMixin, UpdateView):
+    model = Post
+    template_name = "posts/edit_post.html"
+    fields = ["title", "content", "rate", "image", "category", "tags"]
 
-        if form.is_valid():
-            cleaned_data = form.cleaned_data
+    pk_url_kwarg = "id"
+    success_url = reverse_lazy("posts")
 
-            post.title = cleaned_data["title"]
-            post.content = cleaned_data["content"]
-            post.rate = cleaned_data["rate"]
-            if cleaned_data.get("image"):
-                post.image = cleaned_data["image"]
-            post.category_id = cleaned_data["category"]
 
-            post.save()
 
-            return redirect("post", id=post.pk)
-        return render(
-            request,
-            "posts/edit_post.html",
-            context={"post": post, "categories": categories, "errors": form.errors},
+# УДАЛЕНИЕ ПОСТА
+class PostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Post
+    template_name = "posts/delete_post.html"
+
+    pk_url_kwarg = "id"
+    success_url = reverse_lazy("posts")
+
+
+
+# КАТЕГОРИИ
+class CategoryCreateView(LoginRequiredMixin, CreateView):
+    model = Category
+    template_name = "posts/category_create.html"
+    fields = ["name"]
+
+    success_url = reverse_lazy("posts")
+
+
+
+class PostByCategoryView(ListView):
+    model = Post
+    template_name = "posts/posts.html"
+    context_object_name = "posts"
+
+    def get_queryset(self):
+
+        category_id = self.kwargs["id"]
+
+        return Post.objects.filter(
+            category_id=category_id
         )
-
-    return render(
-        request,
-        "posts/edit_post.html",
-        context={"post": post, "categories": categories},
-    )
-
-# lesson5
-def delete_post(request: HttpRequest, id):
-
-    if request.method == "GET":
-        posts = get_object_or_404(Post, id=id)
-
-        posts.delete()
-
-        return redirect("posts")

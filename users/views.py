@@ -34,9 +34,17 @@ def register_user(request):
 
         username = request.POST["username"]
         password = request.POST["password"]
+        confirm_password = request.POST["confirm_password"]
+
+        if password != confirm_password:
+            return render(
+                request,
+                "users/register.html",
+                {"error": "Пароли не совпадают"}
+            )
 
         if User.objects.filter(username=username).exists():
-
+            
             return render(
                 request,
                 "users/register.html",
