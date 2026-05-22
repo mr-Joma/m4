@@ -24,11 +24,11 @@ class PostListView(ListView):
     model = Post
     template_name = "posts/posts.html"
     context_object_name = "posts"
-    paginate_by = 9
+    paginate_by = 6
 
     def get_queryset(self):
 
-        return Post.objects.all().order_by("-created_at")
+        return Post.objects.all().order_by("-views", "-created_at")
 
 
 # ДЕТАЛЬНЫЙ ПОСТ
@@ -36,7 +36,14 @@ class PostDetailView(DetailView):
     model = Post
     template_name = "posts/post.html"
     context_object_name = "post"
-    pk_url_kwarg = "id"
+
+    def get_object(self, queryset=None):
+
+        post = super().get_object(queryset)
+        post.views += 1
+        post.save()
+
+        return post
 
 
 # СОЗДАНИЕ ПОСТА

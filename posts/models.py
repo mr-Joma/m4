@@ -51,6 +51,7 @@ class Post(models.Model):
     )
     
     tags = models.ManyToManyField(Tag, blank=True) # HW5 / убрал null=True
+    views = models.PositiveIntegerField(default=0)
     
     def __str__(self):
         return f"{self.title}  - -  {self.content[:10]}"

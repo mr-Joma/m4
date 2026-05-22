@@ -36,7 +36,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', HomeView.as_view(), name="home"),
     path('posts/', PostListView.as_view(), name="posts"),
-    path('posts/<int:id>/', PostDetailView.as_view(), name="post"),
+    path('posts/<int:pk>/', PostDetailView.as_view(), name="post"),
     path('posts/category/<int:id>/', PostByCategoryView.as_view(), name="category"),
     path('posts/create/', PostCreateView.as_view(), name="create_post"),
     path('posts/<int:id>/edit/', PostUpdateView.as_view(), name="edit_post"),
